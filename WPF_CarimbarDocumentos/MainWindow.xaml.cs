@@ -10,9 +10,13 @@ namespace WPF_CarimbarDocumentos
     /// </summary>
     public partial class MainWindow : Window
     {
-        string inputImagePath = @"...\001.tiff";
-        string outputImagePath = @"...\001_Carimbado.tiff";
+        string inputImagePath = @"...\002.tiff";
+        string outputImagePath = @"...\002_Carimbado.tiff";
         string stampText = "Este documento foi carimbado";
+        int positionX = 10;
+        int positionY = 10;
+        string backgroundImagePath = @"...\marcaDagua.png";
+
 
         public MainWindow()
         {
@@ -25,13 +29,23 @@ namespace WPF_CarimbarDocumentos
             {
                 using (MagickImage image = new MagickImage(inputImagePath))
                 {
-                    DrawableText text = new DrawableText(10, 10, stampText);
+                    // Carrega a imagem de fundo, se disponível
+                    if (!string.IsNullOrEmpty(backgroundImagePath) && File.Exists(backgroundImagePath))
+                    {
+                        using (MagickImage backgroundImage = new MagickImage(backgroundImagePath))
+                        {
+                            image.Composite(backgroundImage, CompositeOperator.Over); // Sobrepor a imagem de fundo
+                        }
+                    }
+
+                    DrawableText text = new DrawableText(positionX, positionY, stampText);
+
                     image.Draw(text);
 
                     image.Write(outputImagePath);
                 }
 
-                MessageBox.Show("Marca d'água adicionada com sucesso.");
+                MessageBox.Show("Arquivo carimbado com sucesso.");
             }
             catch (Exception ex)
             {
